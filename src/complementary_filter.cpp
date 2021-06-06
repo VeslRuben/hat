@@ -34,10 +34,16 @@ float ComplementaryFilter::getPitch() {
     return pitch;
 }
 
-float ComplementaryFilter::gerRoll() {
+float ComplementaryFilter::getRoll() {
     return roll;
 }
 
 float ComplementaryFilter::getDt() {
     return dt;
+}
+
+
+void swag() {
+    float acc_roll = atan2(acc_y, acc_z) * 180 / PI; // Converted to degrees
+    float acc_pitch = atan2(-acc_x, sqrt(pow(acc_y, 2) + pow(acc_z, 2))) * 180 / PI;
 }

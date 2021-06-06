@@ -41,17 +41,17 @@ void Mpu6050::calibrateGyro(int n) {
 
     for (int i = 0; i < n; i++) {
         wire->beginTransmission(MPU6050_ADDR);
-        wire->write(0x43);
+        wire->write(GYRO_XOUT);
         wire->endTransmission(false);
-        wire->requestFrom((int) MPU6050_ADDR, 6);
+        wire->requestFrom(MPU6050_ADDR, 6);
 
         rx = wire->read() << 8 | wire->read();
         ry = wire->read() << 8 | wire->read();
         rz = wire->read() << 8 | wire->read();
 
-        x += ((float) rx) / gyroScale;
-        y += ((float) ry) / gyroScale;
-        z += ((float) rz) / gyroScale;
+        x += (((float) rx) / gyroScale) / 180.0f * (float) M_PI;
+        y += (((float) ry) / gyroScale) / 180.0f * (float) M_PI;
+        z += (((float) rz) / gyroScale) / 180.0f * (float) M_PI;
     }
     gyroOffset[0] = x / (float) n;
     gyroOffset[1] = y / (float) n;
@@ -120,9 +120,9 @@ void Mpu6050::setGyroScale(int n) {
 
 void Mpu6050::update() {
     wire->beginTransmission(MPU6050_ADDR);
-    wire->write(0x3B);
+    wire->write(ACC_XOUT);
     wire->endTransmission(false);
-    wire->requestFrom((int) MPU6050_ADDR, 14);
+    wire->requestFrom(MPU6050_ADDR, 14);
 
     rawAcc[0] = wire->read() << 8 | wire->read();
     rawAcc[1] = wire->read() << 8 | wire->read();
@@ -137,9 +137,9 @@ void Mpu6050::update() {
     acc[1] = ((float) rawAcc[1]) / accScale * 9.81f;
     acc[2] = ((float) rawAcc[2]) / accScale * 9.81f;
 
-    gyro[0] = ((float) rawGyro[0]) / gyroScale;
-    gyro[1] = ((float) rawGyro[1]) / gyroScale;
-    gyro[2] = ((float) rawGyro[2]) / gyroScale;
+    gyro[0] = (((float) rawGyro[0]) / gyroScale) / 180.0f * (float) M_PI;
+    gyro[1] = (((float) rawGyro[1]) / gyroScale) / 180.0f * (float) M_PI;
+    gyro[2] = (((float) rawGyro[2]) / gyroScale) / 180.0f * (float) M_PI;
 
     gyro[0] -= gyroOffset[0];
     gyro[1] -= gyroOffset[1];

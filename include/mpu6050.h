@@ -11,6 +11,8 @@
 #define GYRO_CONFIG_REG  0x1b
 #define ACCEL_CONFIG_REG 0x1c
 #define MPU6050_PWR_MGMT_1   0x6b
+#define ACC_XOUT 0X3B
+#define GYRO_XOUT 0X43
 
 // Commands
 #define GYRO250  0b00000000
