@@ -9,20 +9,20 @@ namespace Matrix
     public:
         Matrix();
         Matrix(int height, int width);
-        Matrix(int height, int width, float *values);
+        Matrix(int height, int width, double *values);
         Matrix(const Matrix &old_obj);
         ~Matrix();
 
         Matrix &operator=(const Matrix &matrix);
 
         void resize(int height, int width);
-        float get(int row, int col);
-        void put(float value, int row, int col);
+        double get(int row, int col);
+        void put(double value, int row, int col);
         int getWidth();
         int getHeight();
 
     private:
-        float *values_;
+        double *values_;
         int width_, height_;
     };
 

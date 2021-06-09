@@ -3,7 +3,8 @@
 #include "complementary_filter.h"
 #include "Wire.h"
 #include "matrix.h"
-#include "Filter.h"
+#include "rotate.h"
+
 
 Mpu6050 mpu(Wire);
 
@@ -32,25 +33,14 @@ void loop() {
     Serial.print(", ");
     Serial.println(cFilt.getPitch());
 
-    double roll = cFilt.getRoll();
-    double vRoll[9] = {1, 0, 0,
-                      0, cos(roll), -sin(roll),
-                      0, sin(roll), cos(roll)};
-    Matrix::Matrix mRoll(3, 3, vRoll);
-
-    double pitch = cFilt.getPitch();
-    double vPitch[9] = {cos(pitch), 0, sin(pitch),
-                       0, 1, 0,
-                       -sin(pitch), 0, cos(pitch)};
-    Matrix::Matrix mPitch(3, 3, vPitch);
+    Matrix::Matrix rotMat;
+    rotate(cFilt.getRoll(), cFilt.getPitch(), rotMat);
 
     Matrix::Matrix acc(3, 1, mpu.getAcc());
 
-    Matrix::Matrix rpResult;
-    Matrix::multiply(mPitch, mRoll, rpResult);
-
     Matrix::Matrix result;
-    Matrix::multiply(rpResult, acc, result);
+    Matrix::multiply(rotMat, acc, result);
+
 
     Serial.print("raw: ");
     Serial.print(mpu.getAcc()[0]);

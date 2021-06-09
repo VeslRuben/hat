@@ -1,5 +1,4 @@
 #include "matrix.h"
-#include <iostream>
 
 namespace Matrix
 {
@@ -7,21 +6,21 @@ namespace Matrix
     {
         width_ = 1;
         height_ = 1;
-        values_ = new float[1];
+        values_ = new double[1];
     }
 
     Matrix::Matrix(int height, int width)
     {
         width_ = width;
         height_ = height;
-        values_ = new float[width * height];
+        values_ = new double[width * height];
     }
 
-    Matrix::Matrix(int height, int width, float *values)
+    Matrix::Matrix(int height, int width, double *values)
     {
         width_ = width;
         height_ = height;
-        values_ = new float[width_ * height_];
+        values_ = new double[width_ * height_];
         for (int i = 0; i < width_ * height_; i++)
         {
             values_[i] = values[i];
@@ -32,7 +31,7 @@ namespace Matrix
     {
         height_ = old_obj.height_;
         width_ = old_obj.width_;
-        values_ = new float[height_ * width_];
+        values_ = new double[height_ * width_];
         for (int i = 0; i < height_ * width_; i++)
         {
             values_[i] = old_obj.values_[i];
@@ -52,7 +51,7 @@ namespace Matrix
             height_ = matrix.height_;
             width_ = matrix.width_;
             delete[] values_;
-            values_ = new float[height_ * width_];;
+            values_ = new double[height_ * width_];;
             for (int i = 0; i < height_ * width_; i++)
             {
                 values_[i] = matrix.values_[i];
@@ -66,15 +65,15 @@ namespace Matrix
         height_ = height;
         width_ = width;
         delete[] values_;
-        values_ = new float[height_ * width_];;
+        values_ = new double[height_ * width_];;
     }
 
-    float Matrix::get(int row, int col)
+    double Matrix::get(int row, int col)
     {
         return values_[row * width_ + col];
     }
 
-    void Matrix::put(float value, int row, int col)
+    void Matrix::put(double value, int row, int col)
     {
         int index = row * width_ + col;
         values_[index] = value;
@@ -98,7 +97,7 @@ namespace Matrix
         {
             int row = i / result.getWidth();
             int col = i % result.getWidth();
-            float sum = 0;
+            double sum = 0;
             for (int j = 0; j < matA.getWidth(); j++)
             {
                 sum += matA.get(row, j) * matB.get(j, col);
@@ -115,7 +114,7 @@ namespace Matrix
         {
             int row = i / result.getWidth();
             int col = i % result.getWidth();
-            float sum = 0;
+            double sum = 0;
             for (int j = 0; j < matA.getWidth(); j++)
             {
                 sum += matA.get(row, j) * matB.get(j, col);
