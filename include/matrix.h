@@ -17,6 +17,8 @@ namespace Matrix {
 
         void put(float value, int row, int col);
 
+        void resize(int height, int width);
+
         int getWidth();
 
         int getHeight();
@@ -29,5 +31,4 @@ namespace Matrix {
 
     void multiply(Matrix &matA, Matrix &matB, Matrix &result);
 }
-
 #endif //HAT_MATRIX_H

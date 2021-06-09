@@ -20,8 +20,9 @@ void ComplementaryFilter::calculate(float *accData, float *gyroData) {
     roll = ((roll + deltaRoll) * alpha) + (rollAcc * (1 - alpha));
 
     // Turning around the Y axis results in a vector on the X-axis
-    pitchAcc = atan2f((float) accData[0], (float) accData[2]);
+    pitchAcc = atan2f(-accData[0], sqrtf(powf(accData[1], 2) + powf(accData[2], 2)));
     pitch = ((pitch + deltaPitch) * alpha) + (pitchAcc * (1 - alpha));
+
 
 
     if (roll > M_PI) roll -= 2.0f * M_PI;
@@ -43,7 +44,7 @@ float ComplementaryFilter::getDt() {
 }
 
 
-void swag() {
-    float acc_roll = atan2(acc_y, acc_z) * 180 / PI; // Converted to degrees
-    float acc_pitch = atan2(-acc_x, sqrt(pow(acc_y, 2) + pow(acc_z, 2))) * 180 / PI;
-}
+//void swag() {
+//    float acc_roll = atan2(acc_y, acc_z) * 180 / PI; // Converted to degrees
+//    float acc_pitch = atan2(-acc_x, sqrt(pow(acc_y, 2) + pow(acc_z, 2))) * 180 / PI;
+//}
