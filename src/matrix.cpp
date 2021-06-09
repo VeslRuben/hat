@@ -10,13 +10,13 @@ namespace Matrix {
     Matrix::Matrix(int height, int width) {
         width_ = width;
         height_ = height;
-        values_ = new float[width * height];
+        values_ = new double[width * height];
     }
 
-    Matrix::Matrix(int height, int width, float *values) {
+    Matrix::Matrix(int height, int width, double *values) {
         width_ = width;
         height_ = height;
-        values_ = new float[width_ * height_];
+        values_ = new double[width_ * height_];
         for (int i = 0; i < width_ * height_; i++) {
             values_[i] = values[i];
         }
@@ -27,11 +27,11 @@ namespace Matrix {
         values_ = nullptr;
     }
 
-    float Matrix::get(int row, int col) {
+    double Matrix::get(int row, int col) {
         return values_[row * width_ + col];
     }
 
-    void Matrix::put(float value, int row, int col) {
+    void Matrix::put(double value, int row, int col) {
         int index = row * width_ + col;
         values_[index] = value;
     }
@@ -39,7 +39,7 @@ namespace Matrix {
     void Matrix::resize(int height, int width) {
         height_ = height;
         width_ = width;
-        float *ptr = new float[height * width];
+        double *ptr = new double[height * width];
         delete[] values_;
         values_ = ptr;
     }
@@ -58,7 +58,7 @@ namespace Matrix {
         for (int i = 0; i < result.getHeight() * result.getWidth(); i++) {
             int row = i / result.getWidth();
             int col = i % result.getWidth();
-            float sum = 0;
+            double sum = 0;
             for (int j = 0; j < matA.getWidth(); j++) {
                 sum += matA.get(row, j) * matB.get(j, col);
             }

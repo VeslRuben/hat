@@ -9,13 +9,13 @@ namespace Matrix {
 
         Matrix(int height, int width);
 
-        Matrix(int height, int width, float *values);
+        Matrix(int height, int width, double *values);
 
         ~Matrix();
 
-        float get(int row, int col);
+        double get(int row, int col);
 
-        void put(float value, int row, int col);
+        void put(double value, int row, int col);
 
         void resize(int height, int width);
 
@@ -26,7 +26,7 @@ namespace Matrix {
 
     private:
         int width_, height_;
-        float *values_;
+        double *values_;
     };
 
     void multiply(Matrix &matA, Matrix &matB, Matrix &result);

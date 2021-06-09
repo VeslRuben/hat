@@ -4,20 +4,20 @@
 class ComplementaryFilter {
 
 public:
-    ComplementaryFilter(float alpha, float fs);
+    ComplementaryFilter(double alpha, double fs);
 
-    void calculate(float *accData, float *gyroData);
+    void calculate(double *accData, double *gyroData);
 
-    float getRoll();
+    double getRoll();
 
-    float getPitch();
+    double getPitch();
 
-    float getDt();
+    double getDt();
 
 private:
 
-    float pitch, roll;
-    float alpha, dt;
+    double pitch, roll;
+    double alpha, dt;
 
 };
 

@@ -1,26 +1,26 @@
 #include "complementary_filter.h"
 #include <cmath>
 
-ComplementaryFilter::ComplementaryFilter(float alpha, float fs) {
+ComplementaryFilter::ComplementaryFilter(double alpha, double fs) {
     pitch = 0.;
     roll = 0.;
     this->alpha = alpha;
     dt = 1.0f / fs;
 }
 
-void ComplementaryFilter::calculate(float *accData, float *gyroData) {
-    float pitchAcc, rollAcc;
+void ComplementaryFilter::calculate(double *accData, double *gyroData) {
+    double pitchAcc, rollAcc;
 
     // Integrate the gyroscope data -> int(angularSpeed) = angle
-    float deltaRoll = gyroData[0] * dt;    // Angle around the X-axis
-    float deltaPitch = gyroData[1] * dt; // Angle around the Y-axis
+    double deltaRoll = gyroData[0] * dt;    // Angle around the X-axis
+    double deltaPitch = gyroData[1] * dt; // Angle around the Y-axis
 
     // Turning around the X axis results in a vector on the Y-axis
-    rollAcc = atan2f((float) accData[1], (float) accData[2]);
+    rollAcc = atan2((double) accData[1], (double) accData[2]);
     roll = ((roll + deltaRoll) * alpha) + (rollAcc * (1 - alpha));
 
     // Turning around the Y axis results in a vector on the X-axis
-    pitchAcc = atan2f(-accData[0], sqrtf(powf(accData[1], 2) + powf(accData[2], 2)));
+    pitchAcc = atan2(-accData[0], sqrt(pow(accData[1], 2) + pow(accData[2], 2)));
     pitch = ((pitch + deltaPitch) * alpha) + (pitchAcc * (1 - alpha));
 
 
@@ -31,20 +31,20 @@ void ComplementaryFilter::calculate(float *accData, float *gyroData) {
     if (pitch < -M_PI) pitch += 2.0f * M_PI;
 }
 
-float ComplementaryFilter::getPitch() {
+double ComplementaryFilter::getPitch() {
     return pitch;
 }
 
-float ComplementaryFilter::getRoll() {
+double ComplementaryFilter::getRoll() {
     return roll;
 }
 
-float ComplementaryFilter::getDt() {
+double ComplementaryFilter::getDt() {
     return dt;
 }
 
 
 //void swag() {
-//    float acc_roll = atan2(acc_y, acc_z) * 180 / PI; // Converted to degrees
-//    float acc_pitch = atan2(-acc_x, sqrt(pow(acc_y, 2) + pow(acc_z, 2))) * 180 / PI;
+//    double acc_roll = atan2(acc_y, acc_z) * 180 / PI; // Converted to degrees
+//    double acc_pitch = atan2(-acc_x, sqrt(pow(acc_y, 2) + pow(acc_z, 2))) * 180 / PI;
 //}

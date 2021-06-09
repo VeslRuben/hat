@@ -44,9 +44,9 @@ public:
 
     void update();
 
-    float *getAcc();
+    double *getAcc();
 
-    float *getGyro();
+    double *getGyro();
 
 
 private:
@@ -55,9 +55,9 @@ private:
     int16_t rawAcc[3], rawGyro[3];
     int16_t rawTemp;
 
-    float acc[3], gyro[3], gyroOffset[3];
+    double acc[3], gyro[3], gyroOffset[3];
 
-    float gyroScale, accScale;
+    double gyroScale, accScale;
 
 
 };

@@ -8,8 +8,8 @@
 Mpu6050 mpu(Wire);
 
 
-float fs = 1;
-float dt = 1 / fs;
+double fs = 1;
+double dt = 1 / fs;
 
 ComplementaryFilter cFilt(0.0, fs);
 
@@ -32,16 +32,16 @@ void loop() {
     Serial.print(", ");
     Serial.println(cFilt.getPitch());
 
-    float roll = cFilt.getRoll();
-    float vRoll[9] = {1, 0, 0,
-                      0, cosf(roll), -sinf(roll),
-                      0, sinf(roll), cosf(roll)};
+    double roll = cFilt.getRoll();
+    double vRoll[9] = {1, 0, 0,
+                      0, cos(roll), -sin(roll),
+                      0, sin(roll), cos(roll)};
     Matrix::Matrix mRoll(3, 3, vRoll);
 
-    float pitch = cFilt.getPitch();
-    float vPitch[9] = {cosf(pitch), 0, sinf(pitch),
+    double pitch = cFilt.getPitch();
+    double vPitch[9] = {cos(pitch), 0, sin(pitch),
                        0, 1, 0,
-                       -sinf(pitch), 0, cosf(pitch)};
+                       -sin(pitch), 0, cos(pitch)};
     Matrix::Matrix mPitch(3, 3, vPitch);
 
     Matrix::Matrix acc(3, 1, mpu.getAcc());
