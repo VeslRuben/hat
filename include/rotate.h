@@ -3,6 +3,6 @@
 #ifndef HAT_ROTATE_H
 #define HAT_ROTATE_H
 
-void rotate(double roll, double pitch, Matrix::Matrix &result);
+Matrix::Matrix rotate(double roll, double pitch);
 
 #endif //HAT_ROTATE_H

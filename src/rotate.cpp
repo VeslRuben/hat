@@ -2,7 +2,7 @@
 #include "matrix.h"
 #include "cmath"
 
-void rotate(double roll, double pitch, Matrix::Matrix &result){
+Matrix::Matrix rotate(double roll, double pitch){
     double vRoll[9] = {1, 0, 0,
                        0, cos(roll), -sin(roll),
                        0, sin(roll), cos(roll)};
@@ -13,5 +13,5 @@ void rotate(double roll, double pitch, Matrix::Matrix &result){
                         -sin(pitch), 0, cos(pitch)};
     Matrix::Matrix mPitch(3, 3, vPitch);
 
-    Matrix::multiply(mPitch, mRoll, result);
+    return Matrix::multiply(mPitch, mRoll);
 }

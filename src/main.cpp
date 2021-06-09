@@ -33,13 +33,13 @@ void loop() {
     Serial.print(", ");
     Serial.println(cFilt.getPitch());
 
-    Matrix::Matrix rotMat;
-    rotate(cFilt.getRoll(), cFilt.getPitch(), rotMat);
+    Matrix::Matrix rotMat = rotate(cFilt.getRoll(), cFilt.getPitch());
+//    rotate(cFilt.getRoll(), cFilt.getPitch());
 
     Matrix::Matrix acc(3, 1, mpu.getAcc());
 
-    Matrix::Matrix result;
-    Matrix::multiply(rotMat, acc, result);
+    Matrix::Matrix result = Matrix::multiply(rotMat,acc);
+//    Matrix::multiply(rotMat, acc, result);
 
 
     Serial.print("raw: ");
