@@ -28,6 +28,12 @@ namespace Matrix
 
     void multiply(Matrix &matA, Matrix &matB, Matrix &result);
     Matrix multiply(Matrix matA, Matrix matB);
+
+    Matrix add(Matrix matA, Matrix matB);
+    void add(Matrix matA, Matrix matB, Matrix &result);
+
+    Matrix sub(Matrix matA, Matrix matB);
+    void sub(Matrix matA, Matrix matB, Matrix &result);
 }
 
 #endif //HAT_MATRIX_H
