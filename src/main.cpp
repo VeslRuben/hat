@@ -37,14 +37,14 @@ void setup() {
 
 
 void loop() {
-    com::recive();
-    com::handelmessage();
+    HostCom::getInstance().receve();
+
 
 //    digitalClockDisplay();
 
-//    sampleMpu();
-//    com::sendMessage(sendBuffer, sendBufferSize, 0xdd);
-//    delete[] sendBuffer;
+    sampleMpu();
+    HostCom::getInstance().sendMessage(sendBuffer, sendBufferSize, 0xdd);
+    delete[] sendBuffer;
 
     while (millis() - t0 < (int) (dt * 1000));
     t0 = millis();
