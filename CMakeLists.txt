@@ -30,4 +30,4 @@ add_custom_target(
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-add_executable(Z_DUMMY_TARGET ${SRC_LIST} src/TimeLib.cpp include/TimeLib.h src/com.cpp include/com.h include/messages.h)
+add_executable(Z_DUMMY_TARGET ${SRC_LIST} src/TimeLib.cpp include/TimeLib.h src/com.cpp include/com.h include/messages.h src/uartHost.cpp include/uartHost.h)

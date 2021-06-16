@@ -4,6 +4,7 @@
 #include "TimeLib.h"
 #include "com.h"
 #include "messages.h"
+#include "uartHost.h"
 
 
 Mpu6050 mpu(Wire);
@@ -14,6 +15,8 @@ char sendBufferSize = 0;
 void digitalClockDisplay();
 
 void sampleMpu();
+
+void handelmessage(HostCom * host);
 
 
 double fs = 10;
@@ -26,6 +29,7 @@ void setup() {
     Serial.begin(115200);
     Wire.begin();
     mpu.begin();
+    HostCom::getInstance().setMessageHandler(handelmessage);
 //    mpu.calibrateGyro(2000);
 
 
@@ -38,9 +42,9 @@ void loop() {
 
 //    digitalClockDisplay();
 
-    sampleMpu();
-    com::sendMessage(sendBuffer, sendBufferSize, 0xdd);
-    delete[] sendBuffer;
+//    sampleMpu();
+//    com::sendMessage(sendBuffer, sendBufferSize, 0xdd);
+//    delete[] sendBuffer;
 
     while (millis() - t0 < (int) (dt * 1000));
     t0 = millis();
@@ -108,4 +112,17 @@ void sampleMpu() {
     sendBufferSize = sizeof(acc) + sizeof(gyro) + sizeof(time);
 
 }
+
+void handelmessage(HostCom * host) {
+    switch (host->id) {
+        case Messages::SetTimeId:
+            Messages::SetTime time{};
+            memcpy(&time, host->data, sizeof(time));
+            TimeLib::setTime(time.hour, time.minute, time.sec, time.mSec, time.day, time.month, time.year);
+            char ack[] = {0x02, 0x00};
+            host->sendMessage(ack, 0, 0x02);
+            break;
+    }
+}
+
 
