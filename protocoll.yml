@@ -1,0 +1,67 @@
+Format:
+  startOfMessage: short (2 bytes) = 0xfffa
+  id: byte
+  len: byte
+  data: byte[len]
+  checkSum: byte
+
+# checksum is the sum of the id, len and data bytes whit overflow
+
+Messages:
+
+  SetTime:
+    startOfMessage: 0xfffa
+    id: 0x01
+    len: 0x09
+    data:
+      year: ushort
+      month: char
+      day: char
+      hour: char
+      minute: char
+      sec: char
+      msec: ushort
+    checksum: ffff
+
+  DataMessage:
+    startOfMessage: 0xfffa
+    id: 0xdd
+    len: lengt of data
+    data[]:
+      - DataMessagesId
+      - len
+      - DataMessage
+    checksum: ffff
+
+DataMessages:
+  Time:
+    id: char
+    len: char
+    year: ushort
+    month: char
+    day: char
+    hour: char
+    minute: char
+    sec: char
+    msec: ushort
+
+  Acceleration:
+    id: char
+    len: char
+    x: float32
+    y: float32
+    z: float32
+
+  Gyro:
+    id: char
+    len: char
+    x: float32
+    y: float32
+    z: float32
+
+  Orientation:
+    id: char
+    len: char
+    x: float32
+    y: float32
+    z: float32

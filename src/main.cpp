@@ -1,31 +1,49 @@
 #include <Arduino.h>
 #include "mpu6050.h"
-#include "complementary_filter.h"
 #include "Wire.h"
-#include "matrix.h"
-#include "rotate.h"
 #include "TimeLib.h"
+#include "com.h"
+#include "messages.h"
 
 
 Mpu6050 mpu(Wire);
 
+char *sendBuffer;
+char sendBufferSize = 0;
 
-double fs = 2;
+void digitalClockDisplay();
+
+void sampleMpu();
+
+double fs = 1;
 double dt = 1 / fs;
-
-ComplementaryFilter cFilt(0.0, fs);
 
 unsigned long t0;
 
+
 void setup() {
     Serial.begin(115200);
-//    Wire.begin();
-//    mpu.begin();
+    Wire.begin();
+    mpu.begin();
 //    mpu.calibrateGyro(2000);
-    setTime(15, 42, 0, 22, 15, 6, 2021);
+
 
 }
 
+
+void loop() {
+    com::recive();
+    com::readMessage();
+
+//    digitalClockDisplay();
+
+    sampleMpu();
+    com::sendMessage(sendBuffer, sendBufferSize, 0xdd);
+
+    delete[] sendBuffer;
+    while (millis() - t0 < (int) (dt * 1000));
+    t0 = millis();
+}
 
 void printDigits(int digits) {
     // utility function for digital clock display: prints preceding colon and leading 0
@@ -35,55 +53,57 @@ void printDigits(int digits) {
     Serial.print(digits);
 }
 
-void loop() {
-//    mpu.update();
-//
-//    cFilt.calculate(mpu.getAcc(), mpu.getGyro());
-//    Serial.print("roll/pitch: ");
-//    Serial.print(cFilt.getRoll());
-//    Serial.print(", ");
-//    Serial.println(cFilt.getPitch());
-//
-//    Matrix::Matrix rotMat = rotate(cFilt.getRoll(), cFilt.getPitch());
-////    rotate(cFilt.getRoll(), cFilt.getPitch());
-//
-//    Matrix::Matrix acc(3, 1, mpu.getAcc());
-//
-//    Matrix::Matrix result = Matrix::multiply(rotMat,acc);
-////    Matrix::multiply(rotMat, acc, result);
-//
-//
-//    Serial.print("raw: ");
-//    Serial.print(mpu.getAcc()[0]);
-//    Serial.print(", ");
-//    Serial.print(mpu.getAcc()[1]);
-//    Serial.print(", ");
-//    Serial.print(mpu.getAcc()[2]);
-//    Serial.println();
-//
-//    Serial.print("rotated: ");
-//    Serial.print(result.get(0, 0));
-//    Serial.print(", ");
-//    Serial.print(result.get(1, 0));
-//    Serial.print(", ");
-//    Serial.print(result.get(2, 0));
-//    Serial.println();
-//    Serial.println();
-
-    time_t t = now();
-    Serial.print(hour(t));
-    printDigits(minute(t));
-    printDigits(second(t));
+void digitalClockDisplay() {
+    // digital clock display of the time
+    Serial.print(TimeLib::hour());
+    printDigits(TimeLib::minute());
+    printDigits(TimeLib::second());
+    Serial.print(":");
+    Serial.print(TimeLib::milliseconds());
     Serial.print(" ");
-    Serial.print(milliseconds(t));
+    Serial.print(TimeLib::day());
     Serial.print(" ");
-    Serial.print(day(t));
+    Serial.print(TimeLib::month());
     Serial.print(" ");
-    Serial.print(month(t));
-    Serial.print(" ");
-    Serial.print(year(t));
+    Serial.print(TimeLib::year());
     Serial.println();
+}
 
-    while (millis() - t0 < (int) (dt * 1000));
-    t0 = millis();
+void sampleMpu() {
+    mpu.update();
+
+    time_t now = TimeLib::now();
+
+    Messages::Acceleration acc = {Messages::AccelerationId, Messages::AccStructSize, (float) mpu.getAcc()[0],
+                                  (float) mpu.getAcc()[1], (float) mpu.getAcc()[2]};
+
+    Messages::Gyro gyro = {Messages::GyroId, Messages::GyroStructSize, (float) mpu.getGyro()[0],
+                           (float) mpu.getGyro()[1], (float) mpu.getGyro()[2]};
+
+    char *accArray = new char[sizeof(acc)];
+    memcpy(accArray, &acc, sizeof(acc));
+
+    char *gyroArray = new char[sizeof(gyro)];
+    memcpy(gyroArray, &gyro, sizeof(gyro));
+
+    char *result;
+    com::mergeArray(accArray, sizeof(acc), gyroArray, sizeof(gyro), result);
+    delete[] accArray;
+    delete[] gyroArray;
+
+    Messages::Time time = {Messages::TimeId, Messages::TimeStructSize, (unsigned short) TimeLib::year(now),
+                           (char) TimeLib::month(now), (char) TimeLib::day(now), (char) TimeLib::hour(now),
+                           (char) TimeLib::minute(now), (char) TimeLib::second(now),
+                           (unsigned short) TimeLib::milliseconds(now)};
+    char *timeArray = new char[sizeof(time)];
+    memcpy(timeArray, &time, sizeof(time));
+
+    char *result2;
+    com::mergeArray(timeArray, sizeof(time), result, sizeof(acc) + sizeof(gyro), result2);
+    delete[] timeArray;
+    delete[] result;
+
+    sendBuffer = result2;
+    sendBufferSize = sizeof(acc) + sizeof(gyro) + sizeof(time);
+
 }
