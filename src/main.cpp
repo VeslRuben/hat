@@ -15,7 +15,7 @@ void digitalClockDisplay();
 
 void sampleMpu();
 
-void handelmessage(HostCom * host);
+void handelmessage(HostCom *host);
 
 
 double fs = 10;
@@ -28,7 +28,7 @@ void setup() {
     Serial.begin(115200);
     Wire.begin();
     mpu.begin();
-    HostCom::getInstance().setMessageHandler(handelmessage);
+    hostCom.setMessageHandler(handelmessage);
 //    mpu.calibrateGyro(2000);
 
 
@@ -84,27 +84,27 @@ void sampleMpu() {
     Messages::Gyro gyro = {Messages::GyroId, Messages::GyroStructSize, (float) mpu.getGyro()[0],
                            (float) mpu.getGyro()[1], (float) mpu.getGyro()[2]};
 
-    char *accArray = new char[sizeof(acc)];
-    memcpy(accArray, &acc, sizeof(acc));
-
-    char *gyroArray = new char[sizeof(gyro)];
-    memcpy(gyroArray, &gyro, sizeof(gyro));
+//    char *accArray = new char[sizeof(acc)];
+//    memcpy(accArray, &acc, sizeof(acc));
+//
+//    char *gyroArray = new char[sizeof(gyro)];
+//    memcpy(gyroArray, &gyro, sizeof(gyro));
 
     char *result;
-    HostCom::getInstance().mergeArray(accArray, sizeof(acc), gyroArray, sizeof(gyro), result);
-    delete[] accArray;
-    delete[] gyroArray;
+    hostCom.mergeArray((char *) &acc, sizeof(acc), (char *) &gyro, sizeof(gyro), result);
+//    delete[] accArray;
+//    delete[] gyroArray;
 
     Messages::Time time = {Messages::TimeId, Messages::TimeStructSize, (unsigned short) TimeLib::year(now),
                            (char) TimeLib::month(now), (char) TimeLib::day(now), (char) TimeLib::hour(now),
                            (char) TimeLib::minute(now), (char) TimeLib::second(now),
                            (unsigned short) TimeLib::milliseconds(now)};
-    char *timeArray = new char[sizeof(time)];
-    memcpy(timeArray, &time, sizeof(time));
+//    char *timeArray = new char[sizeof(time)];
+//    memcpy(timeArray, &time, sizeof(time));
 
     char *result2;
-    HostCom::getInstance().mergeArray(timeArray, sizeof(time), result, sizeof(acc) + sizeof(gyro), result2);
-    delete[] timeArray;
+    hostCom.mergeArray((char *) &time, sizeof(time), result, sizeof(acc) + sizeof(gyro), result2);
+//    delete[] timeArray;
     delete[] result;
 
     sendBuffer = result2;
@@ -112,11 +112,12 @@ void sampleMpu() {
 
 }
 
-void handelmessage(HostCom * host) {
+void handelmessage(HostCom *host) {
     switch (host->id) {
         case Messages::SetTimeId:
             Messages::SetTime time{};
             memcpy(&time, host->data, sizeof(time));
+//            Messages::SetTime time(host->data);
             TimeLib::setTime(time.hour, time.minute, time.sec, time.mSec, time.day, time.month, time.year);
             char ack[] = {0x02, 0x00};
             host->sendMessage(ack, 0, 0x02);

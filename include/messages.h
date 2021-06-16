@@ -14,6 +14,7 @@ namespace Messages {
 
     // Messages
     struct SetTime {
+
         unsigned short year;
         char month;
         char day;
@@ -21,6 +22,18 @@ namespace Messages {
         char minute;
         char sec;
         unsigned short mSec;
+
+        SetTime() {}
+
+        SetTime(char *data) {
+            year = (data[1] << 8) | data[0];
+            month = data[2];
+            day = data[3];
+            hour = data[4];
+            minute = data[5];
+            sec = data[6];
+            mSec = (data[8] << 8) | data[7];
+        }
     };
 
     //============================================================

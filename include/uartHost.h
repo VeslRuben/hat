@@ -5,6 +5,8 @@
 #ifndef HAT_UARTHOST_H
 #define HAT_UARTHOST_H
 
+#define hostCom HostCom::getInstance()
+
 #define IDLE_STATE 0
 #define READ_ID_STATE 1
 #define READ_LEN_STATE 2
