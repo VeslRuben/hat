@@ -31,10 +31,10 @@ namespace com {
 
     void recive();
 
-    void readMessage();
-
     void sendMessage(char *data, char length, char id);
 
     void mergeArray(const char *a1, char size1, const char *a2, char size2, char *&result);
+
+    void handelmessage();
 }
 #endif //HAT_COM_H

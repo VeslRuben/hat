@@ -15,7 +15,8 @@ void digitalClockDisplay();
 
 void sampleMpu();
 
-double fs = 1;
+
+double fs = 10;
 double dt = 1 / fs;
 
 unsigned long t0;
@@ -33,14 +34,14 @@ void setup() {
 
 void loop() {
     com::recive();
-    com::readMessage();
+    com::handelmessage();
 
 //    digitalClockDisplay();
 
     sampleMpu();
     com::sendMessage(sendBuffer, sendBufferSize, 0xdd);
-
     delete[] sendBuffer;
+
     while (millis() - t0 < (int) (dt * 1000));
     t0 = millis();
 }
@@ -107,3 +108,4 @@ void sampleMpu() {
     sendBufferSize = sizeof(acc) + sizeof(gyro) + sizeof(time);
 
 }
+

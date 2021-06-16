@@ -1,9 +1,9 @@
 Format:
   startOfMessage: short (2 bytes) = 0xfffa
-  id: byte
-  len: byte
-  data: byte[len]
-  checkSum: byte
+  id: char
+  len: char
+  data: char[len]
+  checkSum: char
 
 # checksum is the sum of the id, len and data bytes whit overflow
 
@@ -22,6 +22,14 @@ Messages:
       sec: char
       msec: ushort
     checksum: ffff
+
+  SetTimeAck:
+    startOfMessage: 0xfffa
+    id: 0x02
+    len: 0x00
+    data: null
+    checksum: ffff
+
 
   DataMessage:
     startOfMessage: 0xfffa
