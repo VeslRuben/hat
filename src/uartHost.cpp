@@ -84,6 +84,19 @@ void HostCom::sendMessage(char *data, char length, char id) {
     Serial.write(sum);
 }
 
+void HostCom::mergeArray(const char *a1, char size1, const char *a2, char size2, char *&result) {
+    result = new char[size1 + size2];
+    int ri = 0;
+    for (int i = 0; i < size1; ++i) {
+        result[ri] = a1[i];
+        ri++;
+    }
+    for (int i = 0; i < size2; ++i) {
+        result[ri] = a2[i];
+        ri++;
+    }
+}
+
 void HostCom::setMessageHandler(void(*callback)(HostCom * instance)){
     this->callback = callback;
 }

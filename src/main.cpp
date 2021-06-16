@@ -2,7 +2,6 @@
 #include "mpu6050.h"
 #include "Wire.h"
 #include "TimeLib.h"
-#include "com.h"
 #include "messages.h"
 #include "uartHost.h"
 
@@ -92,7 +91,7 @@ void sampleMpu() {
     memcpy(gyroArray, &gyro, sizeof(gyro));
 
     char *result;
-    com::mergeArray(accArray, sizeof(acc), gyroArray, sizeof(gyro), result);
+    HostCom::getInstance().mergeArray(accArray, sizeof(acc), gyroArray, sizeof(gyro), result);
     delete[] accArray;
     delete[] gyroArray;
 
@@ -104,7 +103,7 @@ void sampleMpu() {
     memcpy(timeArray, &time, sizeof(time));
 
     char *result2;
-    com::mergeArray(timeArray, sizeof(time), result, sizeof(acc) + sizeof(gyro), result2);
+    HostCom::getInstance().mergeArray(timeArray, sizeof(time), result, sizeof(acc) + sizeof(gyro), result2);
     delete[] timeArray;
     delete[] result;
 

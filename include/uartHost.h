@@ -24,11 +24,13 @@ public:
 
     void operator=(HostCom const &) = delete;
 
-    void setMessageHandler(void(*callback)(HostCom * instance));
+    void setMessageHandler(void(*callback)(HostCom *instance));
 
     void receve();
 
     void sendMessage(char *data, char length, char id);
+
+    void mergeArray(const char *a1, char size1, const char *a2, char size2, char *&result);
 
     char id = 0;
     char len = 0;
@@ -48,7 +50,7 @@ private:
     char startByte2 = 0xfa;
     char buff[2] = {0, 0};
 
-    void (*callback)(HostCom * instance);
+    void (*callback)(HostCom *instance);
 
 };
 
