@@ -4,15 +4,13 @@
 #include "TimeLib.h"
 #include "messages.h"
 #include "uartHost.h"
-
+#include "flash.h"
 
 Mpu6050 mpu(Wire);
 
-char operationMode = 1;
+char operationMode = 0;  // 0 is not sending anything
 char *sendBuffer;
 char sendBufferSize = 0;
-
-void digitalClockDisplay();
 
 void sampleMpu();
 
@@ -32,6 +30,7 @@ void setup() {
     hostCom.setMessageHandler(handelmessage);
 //    mpu.calibrateGyro(2000);
 
+    flash.loadFromFlash();
 
 }
 
@@ -98,5 +97,3 @@ void handelmessage(HostCom *host) {
             break;
     }
 }
-
-
