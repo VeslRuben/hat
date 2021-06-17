@@ -9,6 +9,8 @@ namespace Messages {
 
     // Message id's
     const char SetTimeId = 0x01;
+    const char SetTimeAckId = 0x02;
+    const char SetOperationModeId = 0x03;
 
     const char DataMessageID = 0xdd;
 
@@ -22,18 +24,6 @@ namespace Messages {
         char minute;
         char sec;
         unsigned short mSec;
-
-        SetTime() {}
-
-        SetTime(char *data) {
-            year = (data[1] << 8) | data[0];
-            month = data[2];
-            day = data[3];
-            hour = data[4];
-            minute = data[5];
-            sec = data[6];
-            mSec = (data[8] << 8) | data[7];
-        }
     };
 
     //============================================================

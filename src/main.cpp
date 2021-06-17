@@ -8,6 +8,7 @@
 
 Mpu6050 mpu(Wire);
 
+char operationMode = 1;
 char *sendBuffer;
 char sendBufferSize = 0;
 
@@ -36,42 +37,18 @@ void setup() {
 
 
 void loop() {
-    HostCom::getInstance().receve();
+    hostCom.receve();
 
-
-//    digitalClockDisplay();
-
-    sampleMpu();
-    HostCom::getInstance().sendMessage(sendBuffer, sendBufferSize, 0xdd);
-    delete[] sendBuffer;
+    if (operationMode == 1) {
+        sampleMpu();
+        hostCom.sendMessage(sendBuffer, sendBufferSize, 0xdd);
+        delete[] sendBuffer;
+    }
 
     while (millis() - t0 < (int) (dt * 1000));
     t0 = millis();
 }
 
-void printDigits(int digits) {
-    // utility function for digital clock display: prints preceding colon and leading 0
-    Serial.print(":");
-    if (digits < 10)
-        Serial.print('0');
-    Serial.print(digits);
-}
-
-void digitalClockDisplay() {
-    // digital clock display of the time
-    Serial.print(TimeLib::hour());
-    printDigits(TimeLib::minute());
-    printDigits(TimeLib::second());
-    Serial.print(":");
-    Serial.print(TimeLib::milliseconds());
-    Serial.print(" ");
-    Serial.print(TimeLib::day());
-    Serial.print(" ");
-    Serial.print(TimeLib::month());
-    Serial.print(" ");
-    Serial.print(TimeLib::year());
-    Serial.println();
-}
 
 void sampleMpu() {
     mpu.update();
@@ -84,27 +61,19 @@ void sampleMpu() {
     Messages::Gyro gyro = {Messages::GyroId, Messages::GyroStructSize, (float) mpu.getGyro()[0],
                            (float) mpu.getGyro()[1], (float) mpu.getGyro()[2]};
 
-//    char *accArray = new char[sizeof(acc)];
-//    memcpy(accArray, &acc, sizeof(acc));
-//
-//    char *gyroArray = new char[sizeof(gyro)];
-//    memcpy(gyroArray, &gyro, sizeof(gyro));
 
     char *result;
     hostCom.mergeArray((char *) &acc, sizeof(acc), (char *) &gyro, sizeof(gyro), result);
-//    delete[] accArray;
-//    delete[] gyroArray;
+
 
     Messages::Time time = {Messages::TimeId, Messages::TimeStructSize, (unsigned short) TimeLib::year(now),
                            (char) TimeLib::month(now), (char) TimeLib::day(now), (char) TimeLib::hour(now),
                            (char) TimeLib::minute(now), (char) TimeLib::second(now),
                            (unsigned short) TimeLib::milliseconds(now)};
-//    char *timeArray = new char[sizeof(time)];
-//    memcpy(timeArray, &time, sizeof(time));
+
 
     char *result2;
     hostCom.mergeArray((char *) &time, sizeof(time), result, sizeof(acc) + sizeof(gyro), result2);
-//    delete[] timeArray;
     delete[] result;
 
     sendBuffer = result2;
@@ -114,13 +83,18 @@ void sampleMpu() {
 
 void handelmessage(HostCom *host) {
     switch (host->id) {
-        case Messages::SetTimeId:
+        case Messages::SetTimeId: {
             Messages::SetTime time{};
             memcpy(&time, host->data, sizeof(time));
-//            Messages::SetTime time(host->data);
             TimeLib::setTime(time.hour, time.minute, time.sec, time.mSec, time.day, time.month, time.year);
-            char ack[] = {0x02, 0x00};
+            char ack[0]{};
             host->sendMessage(ack, 0, 0x02);
+            break;
+        }
+        case Messages::SetOperationModeId:
+            operationMode = host->data[0];
+            if (operationMode > 1) operationMode = 1;        // only 0 and 1 are implemented yet
+            host->sendMessage(host->data, host->len, host->id); // echo the message back as an ack
             break;
     }
 }

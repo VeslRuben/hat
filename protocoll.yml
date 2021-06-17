@@ -30,6 +30,15 @@ Messages:
     data: null
     checksum: ffff
 
+  SetOperationMode:
+    # the chip will reply back wit the same message as a ack
+    startOfMessage: 0xfffa
+    id: 0x03
+    len: 0x01
+    data:
+      char: mode  # 0: off, 1: all on. more mod can be added like only gps or only acc.
+    checksum: ffff
+
 
   DataMessage:
     startOfMessage: 0xfffa
