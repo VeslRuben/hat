@@ -39,6 +39,15 @@ Messages:
       char: mode  # 0: off, 1: all on. more mod can be added like only gps or only acc.
     checksum: ffff
 
+  CalibrateGyroOffset:
+    # send whit data as only 0x00. the chip wil reply wit te calculated offsets.
+    id: 0x04
+    len: 0x00
+    data:
+      x: float
+      y: float
+      z: flaot
+    checksum: ffff
 
   DataMessage:
     startOfMessage: 0xfffa

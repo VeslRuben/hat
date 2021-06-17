@@ -31,12 +31,17 @@ byte Mpu6050::read(byte reg) {
     return data;
 }
 
+Mpu6050::~Mpu6050() {
+    delete[] gyroOffset;
+}
+
 /**
  * Calculate an average for to cancel the gyro drift.
  * @param n: number of samples used for the average
  */
 void Mpu6050::calibrateGyro(int n) {
-    double x = 0, y = 0, z = 0;
+    clearGyroOffset();
+    float x = 0, y = 0, z = 0;
     int16_t rx, ry, rz;
 
     for (int i = 0; i < n; i++) {
@@ -49,13 +54,13 @@ void Mpu6050::calibrateGyro(int n) {
         ry = wire->read() << 8 | wire->read();
         rz = wire->read() << 8 | wire->read();
 
-        x += (((double) rx) / gyroScale) / 180.0f * (double) M_PI;
-        y += (((double) ry) / gyroScale) / 180.0f * (double) M_PI;
-        z += (((double) rz) / gyroScale) / 180.0f * (double) M_PI;
+        x += (((float) rx) / gyroScale) / 180.0f * (float) M_PI;
+        y += (((float) ry) / gyroScale) / 180.0f * (float) M_PI;
+        z += (((float) rz) / gyroScale) / 180.0f * (float) M_PI;
     }
-    gyroOffset[0] = x / (double) n;
-    gyroOffset[1] = y / (double) n;
-    gyroOffset[2] = z / (double) n;
+    gyroOffset[0] = x / (float) n;
+    gyroOffset[1] = y / (float) n;
+    gyroOffset[2] = z / (float) n;
 }
 
 /**
@@ -133,23 +138,37 @@ void Mpu6050::update() {
     rawGyro[2] = wire->read() << 8 | wire->read();
 
 
-    acc[0] = ((double) rawAcc[0]) / accScale * 9.81f;
-    acc[1] = ((double) rawAcc[1]) / accScale * 9.81f;
-    acc[2] = ((double) rawAcc[2]) / accScale * 9.81f;
+    acc[0] = ((float) rawAcc[0]) / accScale * 9.81f;
+    acc[1] = ((float) rawAcc[1]) / accScale * 9.81f;
+    acc[2] = ((float) rawAcc[2]) / accScale * 9.81f;
 
-    gyro[0] = (((double) rawGyro[0]) / gyroScale) / 180.0f * (double) M_PI;
-    gyro[1] = (((double) rawGyro[1]) / gyroScale) / 180.0f * (double) M_PI;
-    gyro[2] = (((double) rawGyro[2]) / gyroScale) / 180.0f * (double) M_PI;
+    gyro[0] = (((float) rawGyro[0]) / gyroScale) / 180.0f * (float) M_PI;
+    gyro[1] = (((float) rawGyro[1]) / gyroScale) / 180.0f * (float) M_PI;
+    gyro[2] = (((float) rawGyro[2]) / gyroScale) / 180.0f * (float) M_PI;
 
     gyro[0] -= gyroOffset[0];
     gyro[1] -= gyroOffset[1];
     gyro[2] -= gyroOffset[2];
 }
 
-double *Mpu6050::getAcc() {
+float *Mpu6050::getAcc() {
     return acc;
 }
 
-double *Mpu6050::getGyro() {
+float *Mpu6050::getGyro() {
     return gyro;
+}
+
+float *Mpu6050::getGyroOffset() {
+    return gyroOffset;
+}
+
+void Mpu6050::setGyroOffset(float *offset) {
+    delete[] gyroOffset;
+    gyroOffset = offset;
+}
+
+void Mpu6050::clearGyroOffset() {
+    delete[] gyroOffset;
+    gyroOffset = new float[3]{};
 }

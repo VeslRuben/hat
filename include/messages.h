@@ -11,6 +11,7 @@ namespace Messages {
     const char SetTimeId = 0x01;
     const char SetTimeAckId = 0x02;
     const char SetOperationModeId = 0x03;
+    const char CalibrateGyroOffsetId = 0x04;
 
     const char DataMessageID = 0xdd;
 

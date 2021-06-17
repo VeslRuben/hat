@@ -33,10 +33,12 @@ void HostCom::receve() {
             case READ_LEN_STATE:
                 if (timeout > millis()) {
                     len = Serial.read();
-                    delete[] data;
-                    data = new char[len];
-                    dataCounter = 0;
-                    state = READ_DATA_STATE;
+                    if (len > 0) {
+                        delete[] data;
+                        data = new char[len];
+                        dataCounter = 0;
+                        state = READ_DATA_STATE;
+                    } else state = READ_CHECKSUM_STATE;
                 } else state = TIMEOUT_STATE;
                 break;
             case READ_DATA_STATE:
@@ -97,6 +99,6 @@ void HostCom::mergeArray(const char *a1, char size1, const char *a2, char size2,
     }
 }
 
-void HostCom::setMessageHandler(void(*callback)(HostCom * instance)){
+void HostCom::setMessageHandler(void(*callback)(HostCom *instance)) {
     this->callback = callback;
 }

@@ -28,9 +28,14 @@ void setup() {
     Wire.begin();
     mpu.begin();
     hostCom.setMessageHandler(handelmessage);
-//    mpu.calibrateGyro(2000);
 
     flash.loadFromFlash();
+
+    float *gyroOffset = new float[3];  // mpu class takes car of deleting the pointer
+    gyroOffset[0] = flash.data.gyroOffsetX;
+    gyroOffset[1] = flash.data.gyroOffsetY;
+    gyroOffset[2] = flash.data.gyroOffsetZ;
+    mpu.setGyroOffset(gyroOffset);
 
 }
 
@@ -54,11 +59,11 @@ void sampleMpu() {
 
     time_t now = TimeLib::now();
 
-    Messages::Acceleration acc = {Messages::AccelerationId, Messages::AccStructSize, (float) mpu.getAcc()[0],
-                                  (float) mpu.getAcc()[1], (float) mpu.getAcc()[2]};
+    Messages::Acceleration acc = {Messages::AccelerationId, Messages::AccStructSize, mpu.getAcc()[0],
+                                  mpu.getAcc()[1], mpu.getAcc()[2]};
 
-    Messages::Gyro gyro = {Messages::GyroId, Messages::GyroStructSize, (float) mpu.getGyro()[0],
-                           (float) mpu.getGyro()[1], (float) mpu.getGyro()[2]};
+    Messages::Gyro gyro = {Messages::GyroId, Messages::GyroStructSize, mpu.getGyro()[0],
+                           mpu.getGyro()[1], mpu.getGyro()[2]};
 
 
     char *result;
@@ -94,6 +99,18 @@ void handelmessage(HostCom *host) {
             operationMode = host->data[0];
             if (operationMode > 1) operationMode = 1;        // only 0 and 1 are implemented yet
             host->sendMessage(host->data, host->len, host->id); // echo the message back as an ack
+            break;
+        case Messages::CalibrateGyroOffsetId: {
+            mpu.calibrateGyro(2000);
+            float *offset = mpu.getGyroOffset();
+            flash.data.gyroOffsetX = offset[0];
+            flash.data.gyroOffsetY = offset[1];
+            flash.data.gyroOffsetZ = offset[2];
+            flash.saveToFlash();
+            host->sendMessage((char *) offset, host->len, host->id); // send back the offset values calculated
+            break;
+        }
+        default:
             break;
     }
 }

@@ -30,6 +30,8 @@ class Mpu6050 {
 public:
     Mpu6050(TwoWire &w);
 
+    ~Mpu6050();
+
     void begin();
 
     void write(int reg, int data);
@@ -44,10 +46,15 @@ public:
 
     void update();
 
-    double *getAcc();
+    float *getAcc();
 
-    double *getGyro();
+    float *getGyro();
 
+    float *getGyroOffset();
+
+    void setGyroOffset(float *offset);
+
+    void clearGyroOffset();
 
 private:
     TwoWire *wire;
@@ -55,9 +62,11 @@ private:
     int16_t rawAcc[3], rawGyro[3];
     int16_t rawTemp;
 
-    double acc[3], gyro[3], gyroOffset[3];
+    float acc[3], gyro[3];
 
-    double gyroScale, accScale;
+    float *gyroOffset = new float[3]{};
+
+    float gyroScale, accScale;
 
 
 };
