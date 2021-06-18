@@ -5,8 +5,11 @@
 #include "messages.h"
 #include "uartHost.h"
 #include "flash.h"
+#include "matrix.h"
+#include "complementary_filter.h"
 
 Mpu6050 mpu(Wire);
+Matrix::Matrix rotMatrix = Matrix::getRotationMatrix(0, 0, 0);
 
 char operationMode = 0;  // 0 is not sending anything
 char *sendBuffer;
@@ -17,8 +20,8 @@ void sampleMpu();
 void handelmessage(HostCom *host);
 
 
-double fs = 10;
-double dt = 1 / fs;
+int fs = 10;
+double dt = (double) 1 / fs;
 
 unsigned long t0;
 
@@ -43,14 +46,22 @@ void setup() {
 void loop() {
     hostCom.receve();
 
-    if (operationMode == 1) {
-        sampleMpu();
-        hostCom.sendMessage(sendBuffer, sendBufferSize, 0xdd);
-        delete[] sendBuffer;
-    }
+    if (millis() - t0 > (dt * 1000)) { // Sample and send imu data
+        t0 = millis();
+        if (operationMode == 1) {
+            sampleMpu();
+            hostCom.sendMessage(sendBuffer, sendBufferSize, 0xdd);
+            delete[] sendBuffer;
+        }
 
-    while (millis() - t0 < (int) (dt * 1000));
-    t0 = millis();
+//        double acc[] = {10., 0., 0.};
+//        Matrix::Matrix accMat(3, 2, acc);
+//        Matrix::Matrix accRotated = Matrix::multiply(rotMatrix, accMat);
+//        Serial.println(accRotated.get(0, 0));
+//        Serial.println(accRotated.get(1, 0));
+//        Serial.println(accRotated.get(2, 0));
+//        Serial.println();
+    }
 }
 
 
@@ -59,11 +70,19 @@ void sampleMpu() {
 
     time_t now = TimeLib::now();
 
-    Messages::Acceleration acc = {Messages::AccelerationId, Messages::AccStructSize, mpu.getAcc()[0],
-                                  mpu.getAcc()[1], mpu.getAcc()[2]};
+    double accValues[] = {(double) mpu.getAcc()[0], (double) mpu.getAcc()[1], (double) mpu.getAcc()[2]};
+    Matrix::Matrix accMat(3, 1, accValues);
+    Matrix::Matrix accRotated = Matrix::multiply(rotMatrix, accMat);
 
-    Messages::Gyro gyro = {Messages::GyroId, Messages::GyroStructSize, mpu.getGyro()[0],
-                           mpu.getGyro()[1], mpu.getGyro()[2]};
+    Messages::Acceleration acc = {Messages::AccelerationId, Messages::AccStructSize, (float) accRotated.get(0, 0),
+                                  (float) accRotated.get(1, 0), (float) accRotated.get(2, 0)};
+
+    double gyroValues[] = {(double) mpu.getGyro()[0], (double) mpu.getGyro()[1], (double) mpu.getGyro()[2]};
+    Matrix::Matrix gyroMat(3, 1, gyroValues);
+    Matrix::Matrix gyroRotated = Matrix::multiply(rotMatrix, gyroMat);
+
+    Messages::Gyro gyro = {Messages::GyroId, Messages::GyroStructSize, (float) gyroRotated.get(0, 0),
+                           (float) gyroRotated.get(1, 0), (float) gyroRotated.get(2, 0)};
 
 
     char *result;
@@ -108,6 +127,38 @@ void handelmessage(HostCom *host) {
             flash.data.gyroOffsetZ = offset[2];
             flash.saveToFlash();
             host->sendMessage((char *) offset, host->len, host->id); // send back the offset values calculated
+            break;
+        }
+        case Messages::CalibrateOrientationId: {
+            Messages::CalibrateOrientation data{};
+            memcpy(&data, host->data, host->len);
+            switch (data.mode) {
+                case 0: { // calibrate the currant orientation of the imu to be flat
+                    ComplementaryFilter filter(0, fs);
+                    double roll = 0;
+                    double pitch = 0;
+                    for (int i = 0; i < fs; ++i) {
+                        mpu.update();
+                        filter.calculate(mpu.getAcc(), mpu.getGyro());
+                        roll += filter.getRoll();
+                        pitch += filter.getPitch();
+                    }
+                    roll = roll / (double) fs;
+                    pitch = pitch / (double) fs;
+                    rotMatrix = Matrix::getRotationMatrix(roll, pitch, 0.);
+                    data.roll = (float) roll;
+                    data.pitch = (float) pitch;
+                    memcpy(host->data, &data, host->len);
+                    host->sendMessage(host->data,host->len, host->id);
+                    break;
+                }
+                case 1:  //  add r, p, y to the current orientation
+
+                    break;
+                case 2:  //  set orientation to r, p, y
+
+                    break;
+            }
             break;
         }
         default:

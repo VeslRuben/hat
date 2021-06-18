@@ -24,12 +24,18 @@ void ComplementaryFilter::calculate(double *accData, double *gyroData) {
     pitch = ((pitch + deltaPitch) * alpha) + (pitchAcc * (1 - alpha));
 
 
-
     if (roll > M_PI) roll -= 2.0f * M_PI;
     if (roll < -M_PI) roll += 2.0f * M_PI;
     if (pitch > M_PI) pitch -= 2.0f * M_PI;
     if (pitch < -M_PI) pitch += 2.0f * M_PI;
 }
+
+void ComplementaryFilter::calculate(float *accData, float *gyroData) {
+    double acc[3] = {(double) accData[0], (double) accData[1], (double) accData[2]};
+    double gyro[3] = {(double) gyroData[0], (double) gyroData[1], (double) gyroData[2]};
+    calculate(acc, gyro);
+}
+
 
 double ComplementaryFilter::getPitch() {
     return pitch;

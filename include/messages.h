@@ -12,6 +12,7 @@ namespace Messages {
     const char SetTimeAckId = 0x02;
     const char SetOperationModeId = 0x03;
     const char CalibrateGyroOffsetId = 0x04;
+    const char CalibrateOrientationId = 0x05;
 
     const char DataMessageID = 0xdd;
 
@@ -25,6 +26,13 @@ namespace Messages {
         char minute;
         char sec;
         unsigned short mSec;
+    };
+
+    struct CalibrateOrientation {
+        char mode;
+        float roll;
+        float pitch;
+        float yaw;
     };
 
     //============================================================

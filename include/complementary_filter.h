@@ -8,6 +8,8 @@ public:
 
     void calculate(double *accData, double *gyroData);
 
+    void calculate(float *accData, float *gyroData);
+
     double getRoll();
 
     double getPitch();

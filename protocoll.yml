@@ -41,14 +41,32 @@ Messages:
 
   CalibrateGyroOffset:
     # send whit data as only 0x00. the chip wil reply wit te calculated offsets.
+    startOfMessage: 0xfffa
     id: 0x04
-    len: 0x00
+    len: 0x0c
     data:
       x: float
       y: float
       z: flaot
     checksum: ffff
 
+  CalibrateOrientation:
+
+    startOfMessage: 0xfffa
+    # mode 0 is to calibrate the currant orientation of the imu to be flat (0,0,-9.8) then r, p, y will be ignored
+    # mode 1 is add r, p, y to the current orientation
+    # mode 2 is set orientation to r, p, y ignoring anny old rotation.
+    # The chip wil reply wit te calculated offsets of r, p, y.
+    id: 0x05
+    len: 0x0d
+    data:
+      mode: char
+      roll: float
+      pitch: float
+      yaw: pitch
+    checksum: ffff
+
+## ================================================
   DataMessage:
     startOfMessage: 0xfffa
     id: 0xdd
