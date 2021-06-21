@@ -15,6 +15,10 @@ struct SaveData {
     float gyroOffsetX;
     float gyroOffsetY;
     float gyroOffsetZ;
+    
+    float roll;
+    float pitch;
+    float yaw;
 };
 
 class Flash {

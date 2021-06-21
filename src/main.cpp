@@ -39,6 +39,7 @@ void setup() {
     gyroOffset[1] = flash.data.gyroOffsetY;
     gyroOffset[2] = flash.data.gyroOffsetZ;
     mpu.setGyroOffset(gyroOffset);
+    rotMatrix = Matrix::getRotationMatrix(flash.data.roll, flash.data.pitch, flash.data.yaw);
 
 }
 
@@ -146,6 +147,9 @@ void handelmessage(HostCom *host) {
                     roll = roll / (double) fs;
                     pitch = pitch / (double) fs;
                     rotMatrix = Matrix::getRotationMatrix(roll, pitch, 0.);
+                    flash.data.roll = (float) roll;
+                    flash.data.pitch = (float) pitch;
+                    flash.data.yaw = 0;
                     data.roll = (float) roll;
                     data.pitch = (float) pitch;
                     memcpy(host->data, &data, host->len);
@@ -164,18 +168,25 @@ void handelmessage(HostCom *host) {
                     double r33 = newRotMatrix.get(2, 2);
                     data.pitch = (float) atan2(-r31, sqrt(pow(r32, 2) + pow(r33, 2)));
                     data.yaw = (float) atan2(r32, r33);
+                    flash.data.roll = data.roll;
+                    flash.data.pitch = data.pitch;
+                    flash.data.yaw = data.yaw;
                     memcpy(host->data, &data, host->len);
                     host->sendMessage(host->data, host->len, host->id);
                     break;
                 }
                 case 2: {  //  set orientation to r, p, y
                     rotMatrix = Matrix::getRotationMatrix(data.roll, data.pitch, data.yaw);
+                    flash.data.roll = data.roll;
+                    flash.data.pitch = data.pitch;
+                    flash.data.yaw = data.yaw;
                     host->sendMessage(host->data, host->len, host->id);
                     break;
                 }
                 default:
                     break;
             }
+            flash.saveToFlash();
             break;
         }
         default:
