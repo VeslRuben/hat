@@ -149,15 +149,30 @@ void handelmessage(HostCom *host) {
                     data.roll = (float) roll;
                     data.pitch = (float) pitch;
                     memcpy(host->data, &data, host->len);
-                    host->sendMessage(host->data,host->len, host->id);
+                    host->sendMessage(host->data, host->len, host->id);
                     break;
                 }
-                case 1:  //  add r, p, y to the current orientation
-
+                case 1: {  //  add r, p, y to the current orientation
+                    Matrix::Matrix tempRotMatrix = Matrix::getRotationMatrix(data.roll, data.pitch, data.yaw);
+                    Matrix::Matrix newRotMatrix = Matrix::multiply(tempRotMatrix, rotMatrix);
+                    rotMatrix = newRotMatrix;
+                    double r21 = newRotMatrix.get(1, 0);
+                    double r11 = newRotMatrix.get(0, 0);
+                    data.roll = (float) atan2(r21, r11);
+                    double r31 = newRotMatrix.get(2, 0);
+                    double r32 = newRotMatrix.get(2, 1);
+                    double r33 = newRotMatrix.get(2, 2);
+                    data.pitch = (float) atan2(-r31, sqrt(pow(r32, 2) + pow(r33, 2)));
+                    data.yaw = (float) atan2(r32, r33);
+                    memcpy(host->data, &data, host->len);
+                    host->sendMessage(host->data, host->len, host->id);
                     break;
-                case 2:  //  set orientation to r, p, y
-
+                }
+                case 2: {  //  set orientation to r, p, y
+                    rotMatrix = Matrix::getRotationMatrix(data.roll, data.pitch, data.yaw);
+                    host->sendMessage(host->data, host->len, host->id);
                     break;
+                }
                 default:
                     break;
             }
