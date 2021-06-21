@@ -158,6 +158,8 @@ void handelmessage(HostCom *host) {
                 case 2:  //  set orientation to r, p, y
 
                     break;
+                default:
+                    break;
             }
             break;
         }

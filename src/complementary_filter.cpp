@@ -16,11 +16,12 @@ void ComplementaryFilter::calculate(double *accData, double *gyroData) {
     double deltaPitch = gyroData[1] * dt; // Angle around the Y-axis
 
     // Turning around the X axis results in a vector on the Y-axis
-    rollAcc = atan2((double) accData[1], (double) accData[2]);
+    rollAcc = atan2(accData[1], accData[2]);
     roll = ((roll + deltaRoll) * alpha) + (rollAcc * (1 - alpha));
 
     // Turning around the Y axis results in a vector on the X-axis
-    pitchAcc = atan2(-accData[0], sqrt(pow(accData[1], 2) + pow(accData[2], 2)));
+    // pitchAcc = atan2(-accData[0], sqrt(pow(accData[1], 2) + pow(accData[2], 2)));
+    pitchAcc = atan2(accData[0], -accData[2]);  // -accData[2] makes -9.8 the direction for down
     pitch = ((pitch + deltaPitch) * alpha) + (pitchAcc * (1 - alpha));
 
 
